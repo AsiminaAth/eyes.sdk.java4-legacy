@@ -15,6 +15,12 @@ public interface ICheckSettings {
     ICheckSettings ignore(Region... regions);
 
     /**
+     * Defines whether the screenshot will contain the entire element or region, even if it's outside the view, or not.
+     * @return This instance of the settings object.
+     */
+    ICheckSettings fully(boolean stitchContent);
+
+    /**
      * Defines that the screenshot will contain the entire element or region, even if it's outside the view.
      * @return This instance of the settings object.
      */

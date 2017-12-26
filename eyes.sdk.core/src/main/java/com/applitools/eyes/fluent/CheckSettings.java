@@ -67,11 +67,19 @@ public class CheckSettings implements ICheckSettings, ICheckSettingsInternal {
      * {@inheritDoc}
      */
     @Override
+    public ICheckSettings fully(boolean stitchContent) {
+        this.stitchContent = stitchContent;
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public ICheckSettings fully() {
         this.stitchContent = true;
         return this;
     }
-
 
     /**
      * {@inheritDoc}
