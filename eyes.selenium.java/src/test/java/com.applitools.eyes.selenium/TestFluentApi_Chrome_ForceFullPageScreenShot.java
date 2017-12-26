@@ -32,18 +32,8 @@ public class TestFluentApi_Chrome_ForceFullPageScreenShot extends TestFluentApi 
         public Statement apply(Statement statement, Description description) {
             ChromeOptions options = new ChromeOptions();
             options.addArguments("disable-infobars");
-            options.addArguments("headless");
-
-            //Run locally
-            //-----------
-            //webDriver = new ChromeDriver(options);
-
-
-            //Run Remotely
-            //------------
-            caps = DesiredCapabilities.chrome();
-            caps.setCapability(ChromeOptions.CAPABILITY, options);
-
+            options.setHeadless(true);
+            caps = options;
             return statement;
         }
     };

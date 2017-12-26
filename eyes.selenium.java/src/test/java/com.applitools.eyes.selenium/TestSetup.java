@@ -6,20 +6,18 @@ import com.applitools.eyes.metadata.SessionResults;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections.CollectionUtils;
-import org.junit.*;
-import org.junit.rules.ExternalResource;
+import org.junit.Assert;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.rules.TestRule;
 import org.junit.rules.TestWatcher;
 import org.junit.runner.Description;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import javax.ws.rs.client.Client;
@@ -30,10 +28,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 
 @RunWith(JUnit4.class)
 public abstract class TestSetup {
@@ -52,7 +48,7 @@ public abstract class TestSetup {
     protected static boolean forceFullPageScreenshot = false;
     protected static boolean runRemotely = true;
     protected static boolean hideScrollbars = true;
-    protected static DesiredCapabilities caps;
+    protected static Capabilities caps;
 
     private HashSet<FloatingMatchSettings> expectedFloatingsSet = new HashSet<>();
 

@@ -9,9 +9,7 @@ import org.junit.runners.Suite;
         SeleniumFluentAPITestsSuite.class,
         TestSpecialCases_Chrome.class,
         TestSpecialCases_Chrome_ForceFullPageScreenshot.class,
-        AdidasTest.class,
-        DellTest.class,
-        WizzAirTest.class
+        //TestCustomerWebsites.class
 })
 
 public class SeleniumTestsSuite {

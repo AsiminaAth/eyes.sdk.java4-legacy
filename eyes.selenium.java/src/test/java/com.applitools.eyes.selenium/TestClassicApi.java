@@ -19,6 +19,11 @@ public abstract class TestClassicApi extends TestSetup {
     }
 
     @Test
+    public void TestCheckRegionNoStitching() {
+        eyes.checkRegion(By.id("overflowing-div"), "Region");
+    }
+
+    @Test
     public void TestCheckFrame() {
         eyes.checkFrame("frame1", "frame1");
     }

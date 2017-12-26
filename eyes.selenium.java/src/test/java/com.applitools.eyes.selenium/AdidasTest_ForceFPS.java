@@ -17,7 +17,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 @RunWith(JUnit4.class)
-public class AdidasTest extends TestSetup {
+public class AdidasTest_ForceFPS extends TestSetup {
 
     @ClassRule
     public static final TestRule setTestSuitName = new ExternalResource() {
@@ -27,7 +27,7 @@ public class AdidasTest extends TestSetup {
             testedPageUrl = "http://www.adidas.com/us/soccer-shoes";
             testedPageSize = new RectangleSize(1380, 680);
             hideScrollbars = false;
-            forceFullPageScreenshot = false;
+            forceFullPageScreenshot = true;
         }
     };
 
@@ -45,12 +45,12 @@ public class AdidasTest extends TestSetup {
     };
 
     @Test
-    public void TestAdidas_Fluent() {
-        eyes.check("Work As expected", Target.region(By.cssSelector("#product-grid")).fully());
+    public void TestAdidas_Fluent_ForceFPS() {
+        eyes.check("Work As expected", Target.region(By.cssSelector("#product-grid")));
     }
 
     @Test
-    public void TestAdidas_Classic(){
-        eyes.checkRegion(By.cssSelector("#product-grid"),"Not working as expected", true);
+    public void TestAdidas_Classic_ForceFPS(){
+        eyes.checkRegion(By.cssSelector("#product-grid"),"Not working as expected");
     }
 }

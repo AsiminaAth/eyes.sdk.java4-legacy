@@ -32,11 +32,9 @@ public class TestServerStatus {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("disable-infobars");
+        options.setHeadless(true);
 
-        DesiredCapabilities caps = DesiredCapabilities.chrome();
-        caps.setCapability(ChromeOptions.CAPABILITY, options);
-
-        webDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), caps);
+        webDriver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
     }
 
     private void teardown() {
