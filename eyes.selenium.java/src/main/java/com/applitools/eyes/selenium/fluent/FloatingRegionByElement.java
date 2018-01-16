@@ -5,6 +5,9 @@ import com.applitools.eyes.fluent.GetFloatingRegion;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class FloatingRegionByElement implements GetFloatingRegion {
 
     private WebElement element;
@@ -22,16 +25,19 @@ public class FloatingRegionByElement implements GetFloatingRegion {
     }
 
     @Override
-    public FloatingMatchSettings getRegion(EyesBase eyesBase, EyesScreenshot screenshot) {
+    public List<FloatingMatchSettings> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
         Point p = element.getLocation();
         Location l = new Location(p.getX(), p.getY());
         Location lTag = screenshot.convertLocation(l, CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
 
-        return new FloatingMatchSettings(
+        List<FloatingMatchSettings> value = new ArrayList<>();
+        value.add(new FloatingMatchSettings(
                 lTag.getX(),
                 lTag.getY(),
                 element.getSize().getWidth(),
                 element.getSize().getHeight(),
-                maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset);
+                maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
+
+        return value;
     }
 }
