@@ -21,13 +21,11 @@ public class ExactMatchSettings {
     private int minDiffHeight;
 
     /**
-     * The ratio of differing pixels above which images are considered
-     * mismatching.
+     * The ratio of differing pixels above which images are considered mismatching.
      */
     private float matchThreshold;
 
 
-    @SuppressWarnings("UnusedDeclaration")
     /**
      *
      * @return The minimal non-ignorable pixel intensity difference.
@@ -36,7 +34,6 @@ public class ExactMatchSettings {
         return minDiffIntensity;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     /**
      *
      * @param minDiffIntensity The minimal non-ignorable pixel intensity
@@ -46,7 +43,6 @@ public class ExactMatchSettings {
         this.minDiffIntensity = minDiffIntensity;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     /**
      *
      * @return The minimal non-ignorable diff region width.
@@ -55,7 +51,6 @@ public class ExactMatchSettings {
         return minDiffWidth;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     /**
      *
      * @param minDiffWidth The minimal non-ignorable diff region width.
@@ -64,7 +59,6 @@ public class ExactMatchSettings {
         this.minDiffWidth = minDiffWidth;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     /**
      *
      * @return The minimal non-ignorable diff region height.
@@ -73,7 +67,6 @@ public class ExactMatchSettings {
         return minDiffHeight;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     /**
      *
      * @param minDiffHeight The minimal non-ignorable diff region height.
@@ -82,21 +75,17 @@ public class ExactMatchSettings {
         this.minDiffHeight = minDiffHeight;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     /**
      *
-     * @return The ratio of differing pixels above which images are
-     * considered mismatching.
+     * @return The ratio of differing pixels above which images are considered mismatching.
      */
     public float getMatchThreshold() {
         return matchThreshold;
     }
 
-    @SuppressWarnings("UnusedDeclaration")
     /**
      *
-     * @param matchThreshold The ratio of differing pixels above which images
-     *                       are considered mismatching.
+     * @param matchThreshold The ratio of differing pixels above which images are considered mismatching.
      */
     public void setMatchThreshold(float matchThreshold) {
         this.matchThreshold = matchThreshold;

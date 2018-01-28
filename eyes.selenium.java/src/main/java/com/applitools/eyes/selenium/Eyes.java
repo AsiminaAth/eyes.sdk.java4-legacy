@@ -16,7 +16,6 @@ import com.applitools.eyes.positioning.RegionProvider;
 import com.applitools.eyes.scaling.FixedScaleProviderFactory;
 import com.applitools.eyes.scaling.NullScaleProvider;
 import com.applitools.eyes.selenium.capture.*;
-import com.applitools.eyes.selenium.exceptions.EyesDriverOperationException;
 import com.applitools.eyes.selenium.fluent.FrameLocator;
 import com.applitools.eyes.selenium.fluent.ISeleniumCheckTarget;
 import com.applitools.eyes.selenium.fluent.ISeleniumFrameCheckTarget;
@@ -64,17 +63,10 @@ public class Eyes extends EyesBase {
     private static final int DEFAULT_WAIT_BEFORE_SCREENSHOTS = 100;
 
     protected EyesWebDriver driver;
-    private boolean dontGetTitle;
+    private boolean doNotGetTitle;
 
     private boolean forceFullPageScreenshot;
     private boolean checkFrameOrElement;
-
-    private String originalDefaultContentOverflow;
-    private String originalFrameOverflow;
-
-    public Region getRegionToCheck() {
-        return regionToCheck;
-    }
 
     public void setRegionToCheck(Region regionToCheck) {
         this.regionToCheck = regionToCheck;
@@ -112,7 +104,7 @@ public class Eyes extends EyesBase {
 
         checkFrameOrElement = false;
         forceFullPageScreenshot = false;
-        dontGetTitle = false;
+        doNotGetTitle = false;
         hideScrollbars = false;
         devicePixelRatio = UNKNOWN_DEVICE_PIXEL_RATIO;
         stitchMode = StitchMode.SCROLL;
@@ -380,12 +372,13 @@ public class Eyes extends EyesBase {
      */
     public void checkWindow(int matchTimeout, String tag) {
 
+        String logMessage = String.format("checkWindow(%d, '%s')", matchTimeout, tag);
         if (getIsDisabled()) {
-            logger.log(String.format("CheckWindow(%d, '%s'): Ignored", matchTimeout, tag));
+            logger.log(logMessage + ": Ignored");
             return;
         }
 
-        logger.log(String.format("CheckWindow(%d, '%s')", matchTimeout, tag));
+        logger.log(logMessage);
 
         this.regionToCheck = null;
 
@@ -622,6 +615,12 @@ public class Eyes extends EyesBase {
     }
 
     public void check(String name, ICheckSettings checkSettings) {
+
+        if (getIsDisabled()) {
+            logger.log(String.format("check('%s', checkSettings): Ignored", name));
+            return;
+        }
+
         ArgumentGuard.notNull(checkSettings, "checkSettings");
 
         logger.verbose(String.format("check(\"%s\", checkSettings) - begin", name));
@@ -653,7 +652,7 @@ public class Eyes extends EyesBase {
             if (targetElement != null) {
                 this.targetElement = targetElement;
                 if (this.stitchContent) {
-                    this.checkElement(name, checkSettings);
+                    this.checkElement(targetElement, name, checkSettings);
                 } else {
                     this.checkRegion(name, checkSettings);
                 }
@@ -878,7 +877,7 @@ public class Eyes extends EyesBase {
      * {@code tag} defaults to {@code null}.
      */
     public void checkRegion(WebElement element) {
-        checkRegion(element, null);
+        checkRegion(element, USE_DEFAULT_MATCH_TIMEOUT, null, false);
     }
 
     /**
@@ -887,13 +886,7 @@ public class Eyes extends EyesBase {
      * behaves the same as {@link #checkElement(WebElement)}.
      */
     public void checkRegion(WebElement element, boolean stitchContent) {
-        this.stitchContent = stitchContent;
-        if (stitchContent) {
-            checkElement(element);
-        } else {
-            checkRegion(element);
-        }
-        this.stitchContent = false;
+        checkRegion(element, USE_DEFAULT_MATCH_TIMEOUT, null, stitchContent);
     }
 
     /**
@@ -901,7 +894,7 @@ public class Eyes extends EyesBase {
      * Default match timeout is used.
      */
     public void checkRegion(WebElement element, String tag) {
-        checkRegion(element, USE_DEFAULT_MATCH_TIMEOUT, tag);
+        checkRegion(element, USE_DEFAULT_MATCH_TIMEOUT, tag, false);
     }
 
     /**
@@ -910,13 +903,7 @@ public class Eyes extends EyesBase {
      * behaves the same as {@link #checkElement(WebElement, String)}.
      */
     public void checkRegion(WebElement element, String tag, boolean stitchContent) {
-        this.stitchContent = stitchContent;
-        if (stitchContent) {
-            checkElement(element, tag);
-        } else {
-            checkRegion(element, tag);
-        }
-        this.stitchContent = false;
+        checkRegion(element, USE_DEFAULT_MATCH_TIMEOUT, tag, stitchContent);
     }
 
     /**
@@ -929,40 +916,7 @@ public class Eyes extends EyesBase {
      *                             immediate failure reports are enabled
      */
     public void checkRegion(final WebElement element, int matchTimeout, String tag) {
-        if (getIsDisabled()) {
-            logger.log(String.format("CheckRegion(element, %d, '%s'): Ignored", matchTimeout, tag));
-            return;
-        }
-
-        ArgumentGuard.notNull(element, "element");
-
-        logger.log(String.format("CheckRegion(element, %d, '%s')",
-                matchTimeout, tag));
-
-        this.regionToCheck = null;
-
-        // If needed, scroll to the top/left of the element (additional help
-        // to make sure it's visible).
-        Point locationAsPoint = element.getLocation();
-        regionVisibilityStrategy.moveToRegion(positionProvider,
-                new Location(locationAsPoint.getX(), locationAsPoint.getY()));
-
-        super.checkWindowBase(
-                new RegionProvider() {
-                    public Region getRegion() {
-                        Point p = element.getLocation();
-                        Dimension d = element.getSize();
-                        return new Region(p.getX(), p.getY(), d.getWidth(),
-                                d.getHeight(), CoordinatesType.CONTEXT_RELATIVE);
-                    }
-                },
-                tag,
-                false,
-                matchTimeout
-        );
-        logger.verbose("Done! trying to scroll back to original position..");
-        regionVisibilityStrategy.returnToOriginalPosition(positionProvider);
-        logger.verbose("Done!");
+        checkRegion(element, matchTimeout, tag, false);
     }
 
     /**
@@ -971,13 +925,11 @@ public class Eyes extends EyesBase {
      * behaves the same as {@link #checkElement(WebElement, String)}.
      */
     public void checkRegion(WebElement element, int matchTimeout, String tag, boolean stitchContent) {
-        this.stitchContent = stitchContent;
-        if (stitchContent) {
-            checkElement(element, matchTimeout, tag);
-        } else {
-            checkRegion(element, matchTimeout, tag);
+        if (getIsDisabled()) {
+            logger.log("CheckRegion: Ignored");
+            return;
         }
-        this.stitchContent = false;
+        check(tag, Target.region(element).timeout(matchTimeout).fully(stitchContent));
     }
 
     /**
@@ -994,13 +946,7 @@ public class Eyes extends EyesBase {
      * same as {@code #checkElement(org.openqa.selenium.By)}
      */
     public void checkRegion(By selector, boolean stitchContent) {
-        this.stitchContent = stitchContent;
-        if (stitchContent) {
-            checkElement(selector);
-        } else {
-            checkRegion(selector);
-        }
-        this.stitchContent = false;
+        checkRegion(selector, USE_DEFAULT_MATCH_TIMEOUT, null, stitchContent);
     }
 
     /**
@@ -1017,13 +963,7 @@ public class Eyes extends EyesBase {
      * behaves the same as {@link #checkElement(By, String)}.
      */
     public void checkRegion(By selector, String tag, boolean stitchContent) {
-        this.stitchContent = stitchContent;
-        if (stitchContent) {
-            checkElement(selector, tag);
-        } else {
-            checkRegion(selector, tag);
-        }
-        this.stitchContent = false;
+        checkRegion(selector, USE_DEFAULT_MATCH_TIMEOUT, tag, stitchContent);
     }
 
     /**
@@ -1036,14 +976,7 @@ public class Eyes extends EyesBase {
      *                             immediate failure reports are enabled
      */
     public void checkRegion(By selector, int matchTimeout, String tag) {
-
-        if (getIsDisabled()) {
-            logger.log(String.format("CheckRegion(selector, %d, '%s'): Ignored",
-                    matchTimeout, tag));
-            return;
-        }
-
-        checkRegion(driver.findElement(selector), matchTimeout, tag);
+        checkRegion(selector, matchTimeout, tag, false);
     }
 
     /**
@@ -1052,13 +985,11 @@ public class Eyes extends EyesBase {
      * behaves the same as {@link #checkElement(By, int, String)}.
      */
     public void checkRegion(By selector, int matchTimeout, String tag, boolean stitchContent) {
-        this.stitchContent = stitchContent;
-        if (stitchContent) {
-            checkElement(selector, matchTimeout, tag);
-        } else {
-            checkRegion(selector, matchTimeout, tag);
+        if (getIsDisabled()) {
+            logger.log("CheckRegion: Ignored");
+            return;
         }
-        this.stitchContent = false;
+        check(tag, Target.region(selector).timeout(matchTimeout).fully(stitchContent));
     }
 
     /**
@@ -1090,8 +1021,7 @@ public class Eyes extends EyesBase {
      * Default match timeout is used.
      */
     public void checkRegionInFrame(int frameIndex, By selector, String tag, boolean stitchContent) {
-        checkRegionInFrame(frameIndex, selector, USE_DEFAULT_MATCH_TIMEOUT,
-                tag, stitchContent);
+        checkRegionInFrame(frameIndex, selector, USE_DEFAULT_MATCH_TIMEOUT, tag, stitchContent);
     }
 
     /**
@@ -1629,10 +1559,6 @@ public class Eyes extends EyesBase {
         checkElement(element, USE_DEFAULT_MATCH_TIMEOUT, tag);
     }
 
-    private void checkElement(String name, ICheckSettings checkSettings) {
-        this.checkElement(this.targetElement, name, checkSettings);
-    }
-
     private void checkElement(WebElement element, String name, ICheckSettings checkSettings) {
 
         // Since the element might already have been found using EyesWebDriver.
@@ -1951,7 +1877,7 @@ public class Eyes extends EyesBase {
             while (fc.size() > 0) {
                 driver.getRemoteWebDriver().switchTo().parentFrame();
                 Frame frame = fc.pop();
-                ((EyesRemoteWebElement)frame.getReference()).setOverflow(frame.getOriginalOverflow());
+                ((EyesRemoteWebElement) frame.getReference()).setOverflow(frame.getOriginalOverflow());
             }
             ((EyesTargetLocator) driver.switchTo()).frames(originalFC);
         }
@@ -2049,12 +1975,12 @@ public class Eyes extends EyesBase {
 
     @Override
     protected String getTitle() {
-        if (!dontGetTitle) {
+        if (!doNotGetTitle) {
             try {
                 return driver.getTitle();
             } catch (Exception ex) {
                 logger.verbose("failed (" + ex.getMessage() + ")");
-                dontGetTitle = true;
+                doNotGetTitle = true;
             }
         }
 

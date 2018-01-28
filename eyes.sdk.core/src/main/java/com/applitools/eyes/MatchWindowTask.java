@@ -93,7 +93,7 @@ public class MatchWindowTask {
         EyesScreenshot screenshot = appOutput.getScreenshot();
         List<Region> ignoreRegions = new ArrayList<>();
         for (GetRegion ignoreRegionProvider : checkSettingsInternal.getIgnoreRegions()) {
-            ignoreRegions.add(ignoreRegionProvider.getRegion(eyes, screenshot));
+            ignoreRegions.addAll(ignoreRegionProvider.getRegions(eyes, screenshot));
         }
         imageMatchSettings.setIgnoreRegions(ignoreRegions.toArray(new Region[0]));
     }
@@ -104,7 +104,7 @@ public class MatchWindowTask {
         EyesScreenshot screenshot = appOutput.getScreenshot();
         List<FloatingMatchSettings> floatingRegions = new ArrayList<>();
         for (GetFloatingRegion floatingRegionProvider : checkSettingsInternal.getFloatingRegions()) {
-            floatingRegions.add(floatingRegionProvider.getRegion(eyes, screenshot));
+            floatingRegions.addAll(floatingRegionProvider.getRegions(eyes, screenshot));
         }
         imageMatchSettings.setFloatingRegions(floatingRegions.toArray(new FloatingMatchSettings[0]));
     }

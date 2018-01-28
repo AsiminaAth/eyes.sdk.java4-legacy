@@ -89,6 +89,10 @@ public abstract class EyesBase {
     private boolean isViewportSizeSet;
     protected int stitchingOverlap = 50;
 
+    public EyesBase(String serverUrl) throws URISyntaxException {
+        this(new URI(serverUrl));
+    }
+
     /**
      * Creates a new {@code EyesBase}instance that interacts with the Eyes
      * Server at the specified url.
@@ -139,7 +143,6 @@ public abstract class EyesBase {
     /**
      * Sets the user given agent id of the SDK. {@code null} is referred to
      * as no id.
-     *
      * @param agentId The agent ID to set.
      */
     public void setAgentId(String agentId) {
@@ -170,6 +173,14 @@ public abstract class EyesBase {
         return serverConnector.getApiKey();
     }
 
+    /**
+     * Sets the current server URL used by the rest client.
+     * @param serverUrl The URI of the rest server, or {@code null} to use
+     *                  the default server.
+     */
+    public void setServerUrl(String serverUrl) throws URISyntaxException {
+        setServerUrl(new URI(serverUrl));
+    }
 
     /**
      * Sets the current server URL used by the rest client.
@@ -512,7 +523,6 @@ public abstract class EyesBase {
 
     /**
      * Adds a property to be sent to the server.
-     *
      * @param name  The property name.
      * @param value The property value.
      */
@@ -577,7 +587,9 @@ public abstract class EyesBase {
         return debugScreenshotsProvider.getPrefix();
     }
 
-    public DebugScreenshotsProvider getDebugScreenshotsProvider() { return debugScreenshotsProvider; }
+    public DebugScreenshotsProvider getDebugScreenshotsProvider() {
+        return debugScreenshotsProvider;
+    }
 
     /**
      * @return Whether to ignore or the blinking caret or not when comparing images.
@@ -1033,8 +1045,11 @@ public abstract class EyesBase {
         return result;
     }
 
-    protected void beforeMatchWindow() { }
-    protected void afterMatchWindow() { }
+    protected void beforeMatchWindow() {
+    }
+
+    protected void afterMatchWindow() {
+    }
 
     private static MatchResult matchWindow(RegionProvider regionProvider, String tag, boolean ignoreMismatch,
                                            ICheckSettings checkSettings, EyesBase self) {
@@ -1232,8 +1247,11 @@ public abstract class EyesBase {
         }
     }
 
-    protected void beforeOpen() { }
-    protected void afterOpen() { }
+    protected void beforeOpen() {
+    }
+
+    protected void afterOpen() {
+    }
 
     private void ensureRunningSession() {
         if (runningSession != null) {
@@ -1298,11 +1316,10 @@ public abstract class EyesBase {
 
     /**
      * Define the viewport size as {@code size} without doing any actual action on the
-     *
      * @param explicitViewportSize The size of the viewport. {@code null} disables the explicit size.
      */
     public void setExplicitViewportSize(RectangleSize explicitViewportSize) {
-        if(explicitViewportSize == null) {
+        if (explicitViewportSize == null) {
             viewportSizeHandler = new SimplePropertyHandler<>();
             viewportSizeHandler.set(null);
             this.isViewportSizeSet = false;
@@ -1542,7 +1559,7 @@ public abstract class EyesBase {
         // Cropping by region if necessary
         if (!region.isEmpty()) {
             screenshot = screenshot.getSubScreenshot(region, false);
-            debugScreenshotsProvider.save(screenshot.getImage(),"SUB_SCREENSHOT");
+            debugScreenshotsProvider.save(screenshot.getImage(), "SUB_SCREENSHOT");
         }
 
         logger.verbose("Compressing screenshot...");

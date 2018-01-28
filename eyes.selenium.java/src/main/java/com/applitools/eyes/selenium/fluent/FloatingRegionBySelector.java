@@ -7,7 +7,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 
-public class FloatingRegionBySelector implements GetFloatingRegion{
+import java.util.ArrayList;
+import java.util.List;
+
+public class FloatingRegionBySelector implements GetFloatingRegion {
 
     private By selector;
     private int maxUpOffset;
@@ -25,16 +28,20 @@ public class FloatingRegionBySelector implements GetFloatingRegion{
     }
 
     @Override
-    public FloatingMatchSettings getRegion(EyesBase eyesBase, EyesScreenshot screenshot) {
-        WebElement element = ((Eyes)eyesBase).getDriver().findElement(this.selector);
-        Point p = element.getLocation();
-        Location l = new Location(p.getX(), p.getY());
-        Location lTag = screenshot.convertLocation(l, CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
-        return new FloatingMatchSettings(
-                lTag.getX(),
-                lTag.getY(),
-                element.getSize().getWidth(),
-                element.getSize().getHeight(),
-                maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset);
+    public List<FloatingMatchSettings> getRegions(EyesBase eyesBase, EyesScreenshot screenshot) {
+        List<WebElement> elements = ((Eyes) eyesBase).getDriver().findElements(this.selector);
+        List<FloatingMatchSettings> value = new ArrayList<>();
+        for (WebElement element : elements) {
+            Point p = element.getLocation();
+            Location l = new Location(p.getX(), p.getY());
+            Location lTag = screenshot.convertLocation(l, CoordinatesType.CONTEXT_RELATIVE, CoordinatesType.SCREENSHOT_AS_IS);
+            value.add(new FloatingMatchSettings(
+                    lTag.getX(),
+                    lTag.getY(),
+                    element.getSize().getWidth(),
+                    element.getSize().getHeight(),
+                    maxUpOffset, maxDownOffset, maxLeftOffset, maxRightOffset));
+        }
+        return value;
     }
 }
